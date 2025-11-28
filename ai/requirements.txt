@@ -1,0 +1,11 @@
+sentence-transformers
+pypdf
+numpy
+pandas
+fastapi
+uvicorn
+paddleocr
+transformers
+torch
+accelerate
+faiss-cpu
