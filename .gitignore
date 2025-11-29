@@ -1,0 +1,46 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs
+*.log
+log.txt
+
+# Build outputs
+dist/
+build/
+.cache/
+.next/
+
+# Editor
+.vscode/
+.idea/
+
+# Python (AI part)
+__pycache__/
+*.pyc
+venv/
+.env/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Mongo dumps
+dump/
+
+# Models / embeddings / checkpoints
+*.bin
+*.pt
+*.ckpt
+*.pkl
+models/
+vector_store/
