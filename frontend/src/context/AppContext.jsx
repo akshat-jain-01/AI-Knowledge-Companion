@@ -14,8 +14,9 @@ const AppContextProvider = (props) =>{
 
     const logout = () =>{
         localStorage.removeItem('token')
-        settoken('')
+        settoken(null)
         setuser(null)
+        navigate('/signin')
     }
 
     const value = {
