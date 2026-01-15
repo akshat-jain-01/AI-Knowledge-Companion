@@ -6,6 +6,9 @@ import authRoute from './routes/authRoute.js'
 import uploader from './controllers/uploadController.js'
 import upload from './config/multer.js'
 import multer from 'multer'
+import 'dotenv/config'
+import router2 from './services/aiServices.js'
+
 
 const app = express()
 
@@ -17,11 +20,14 @@ app.use(morgan('combined'))
 
 app.get('/', (req, res) =>{
     res.send('Express app is running')
+    console.log("AI SERVICE URL:", process.env.AI_SERVICE_BASE_URL)
 })
 
 app.post('/uploader', upload.single("file"), uploader)
 
 app.use('/api/auth', authRoute)
+app.use('/api/ai', router2)
+
 
 app.use((err, req, res, next) =>{
 

@@ -2,6 +2,7 @@ import usermodel from "../models/user.js"
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
+
 export const registerService = async(req, res) =>{
     try{
         const{name, email, password} = req.body
