@@ -2,6 +2,7 @@ import { response } from "express"
 import upload from "../config/multer.js"
 import { extractTextFromFile } from "../services/TextExtractor.js"
 import axios from "axios"
+import { chunkText } from "../services/chunker.js"
 
 const uploader = async(req, res) =>{
     try {
@@ -22,6 +23,15 @@ const uploader = async(req, res) =>{
         }
 
         console.log("Extracted text length ", text.length)
+
+        const chunks = chunkText({
+            text : text,
+            userId : req.user?.id || "temp_user",
+            fileId : req.file.filename
+        })
+
+        console.log("Total chunks:", chunks.length)
+        console.log("Sample chunk:", chunks[0])
 
         const payload = {
             user_id : req.user?.id || "temp_user",
