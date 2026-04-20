@@ -44,14 +44,16 @@
 
 import numpy as np
 import faiss
+from service.faiss_persistence import load_index, save_index
+from service.metadata_persistance import load_metadata, save_metadata
 
 EMBEDDING_DIM = 384
 
 # 🔥 cosine similarity via inner product (with normalization)
-index = faiss.IndexFlatIP(EMBEDDING_DIM)
+index = load_index(EMBEDDING_DIM)
 
 # 🔥 mapping store (ONLY identifiers, no text)
-metadata_store = []
+metadata_store = load_metadata()
 
 
 def add_embedding(embedding: list[float], metadata: dict):
@@ -70,6 +72,7 @@ def add_embedding(embedding: list[float], metadata: dict):
     faiss.normalize_L2(vector)
 
     index.add(vector)
+    save_index(index)  # 🔥 persist index after each addition
 
     # 🔥 store only mapping info
     metadata_store.append({
@@ -77,6 +80,8 @@ def add_embedding(embedding: list[float], metadata: dict):
         "file_id": metadata["file_id"],
         "chunk_index": metadata["chunk_index"]
     })
+
+    save_metadata(metadata_store)
 
 
 def search(query_embedding: list[float], k: int = 3):

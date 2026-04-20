@@ -71,7 +71,7 @@ import ChunkModel from "../models/chunk.model.js"
 
 const askController = async (req, res) => {
   try {
-    const { question, top_k = 3 } = req.body
+    const { question, top_k = 3, user_id } = req.body
 
     // 1️⃣ Validation
     if (!question || !question.trim()) {
@@ -81,11 +81,19 @@ const askController = async (req, res) => {
       })
     }
 
+
+    if (!user_id || !user_id.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is empty"
+      })
+    }
+
     // 2️⃣ FAISS search
     const searchResponse = await axios.post(
       `${process.env.AI_SERVICE_BASE_URL}/search`,
       { query: question, top_k },
-      { timeout: 10000 }
+      { timeout: 30000 }
     )
 
     const matches = searchResponse.data.results || []
@@ -115,20 +123,25 @@ const askController = async (req, res) => {
     const orderedChunks = matches.map(m =>
       dbChunks.find(
         d =>
-          d.file_id === m.file_id &&
+          d.file_id.toString() === m.file_id.toString() &&
           d.chunk_index === m.chunk_index
       )
     ).filter(Boolean)
 
     // 4️⃣ Context build
-    const MAX_CHARS = 2000  // 🔥 limit
+    //const MAX_CHARS = 2000  // 🔥 limit
 
     let context = ""
 
-    for (const chunk of orderedChunks) {
-      if ((context + chunk.text).length > MAX_CHARS) break
-      context += chunk.text + "\n\n"
-  }
+    for (let i = 0; i < orderedChunks.length; i++) {
+      const chunkText = `--- Chunk ${i} ---\n${orderedChunks[i].text}\n\n`
+
+      //if ((context + chunkText).length > MAX_CHARS) break
+
+      context += chunkText
+    }
+
+    console.log("CONTEXT:", context)
     
 
     // 5️⃣ LLM call
@@ -136,9 +149,10 @@ const askController = async (req, res) => {
       `${process.env.AI_SERVICE_BASE_URL}/ask`,
       {
         question,
-        context
+        context, 
+        user_id
       },
-      { timeout: 20000 }
+      { timeout: 30000 }
     )
 
     // 6️⃣ Response

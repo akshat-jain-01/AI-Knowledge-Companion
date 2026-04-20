@@ -1,4 +1,4 @@
-def build_prompt(context_or_chunks, question: str) -> str:
+def build_prompt(context_or_chunks, question: str, history) -> str:
     system_instruction = (
         "You are a helpful AI assistant.\n"
         "Answer the question using the provided context.\n"
@@ -12,6 +12,7 @@ def build_prompt(context_or_chunks, question: str) -> str:
         context = context_or_chunks
         prompt = (
             f"{system_instruction}\n"
+            f"Conversation history:\n{history}\n"
             f"Context:\n{context}\n"
             f"Question:\n{question}\n"
             f"Answer:"
@@ -25,6 +26,7 @@ def build_prompt(context_or_chunks, question: str) -> str:
 
         prompt = (
             f"{system_instruction}\n"
+            f"Conversation history:\n{history}\n"
             f"Context:\n{context_block}\n"
             f"Question:\n{question}\n"
             f"Answer:"

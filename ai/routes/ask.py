@@ -47,16 +47,22 @@ from pydantic import BaseModel
 
 from service.prompt_builder import build_prompt
 from service.llm_service import generate_answer
+from service.memory_service import get_history_text, add_message 
 
 router = APIRouter()
 
 class AskRequest(BaseModel):
     question: str
-    context: str   # 🔥 context aayega Node se
+    context: str 
+    user_id: str
 
 
 @router.post("/ask")
 async def ask_question(data: AskRequest):
+
+
+    history = get_history_text(data.user_id) or "No previous conversation"
+    print("HISTORY:\n", history)
 
     # ❌ old chunks logic hata diya
     # ✅ new context check
@@ -68,7 +74,7 @@ async def ask_question(data: AskRequest):
         }
 
     # 🔥 build prompt
-    prompt = build_prompt(data.context, data.question)
+    prompt = build_prompt(data.context, data.question, history)
 
     print("========== DEBUG ==========")
     print("QUESTION:", data.question)
@@ -77,6 +83,9 @@ async def ask_question(data: AskRequest):
 
     # 🔥 LLM call
     answer = generate_answer(prompt)
+
+    add_message(data.user_id, "user", data.question)
+    add_message(data.user_id, "assistant", answer)
 
     return {
         "status": "success",
