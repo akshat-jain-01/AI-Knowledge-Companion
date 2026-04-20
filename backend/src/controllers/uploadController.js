@@ -3,6 +3,7 @@ import upload from "../config/multer.js"
 import { extractTextFromFile } from "../services/TextExtractor.js"
 import axios from "axios"
 import { chunkText } from "../services/chunker.js"
+import ChunkModel from "../models/chunk.model.js"
 
 const uploader = async (req, res) => {
   try {
@@ -32,6 +33,7 @@ const uploader = async (req, res) => {
 
     console.log("Total chunks:", chunks.length)
     console.log("Sample chunk:", chunks[0])
+    await ChunkModel.insertMany(chunks)
 
     // 🔥 MAIN FIX: har chunk ko AI /embed bhejna
     for (const chunk of chunks) {

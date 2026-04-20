@@ -8,15 +8,14 @@ import upload from './config/multer.js'
 import multer from 'multer'
 import 'dotenv/config'
 import router2 from './services/aiServices.js'
-
+import askRoute from './routes/askRoute.js'
+import router3 from './routes/summaryRoutes.js'
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
 app.use(morgan('combined'))
-
-
 
 app.get('/', (req, res) =>{
     res.send('Express app is running')
@@ -27,6 +26,8 @@ app.post('/uploader', upload.single("file"), uploader)
 
 app.use('/api/auth', authRoute)
 app.use('/api/ai', router2)
+app.use("/api", askRoute)
+app.use("/api", router3)
 
 
 app.use((err, req, res, next) =>{

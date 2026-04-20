@@ -25,7 +25,6 @@ async def ingest_data(data : EmbedRequest):
         "user_id": data.user_id,
         "file_id": data.file_id,
         "chunk_index": data.chunk_index,
-        "text": data.text
     }
 
     add_embedding(embedding, metadata)
