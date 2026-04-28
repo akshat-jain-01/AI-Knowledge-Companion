@@ -9,6 +9,8 @@ router = APIRouter()
 class SearchRequest(BaseModel):
     query: str
     top_k: int = 3
+    user_id: str
+    file_id: str
 
 
 @router.post("/search")
@@ -21,7 +23,12 @@ async def search_chunks(data: SearchRequest):
 
     query_embedding = generate_embedding(data.query)
 
-    results = faiss_search(query_embedding, data.top_k)
+    results = faiss_search(
+        query_embedding, 
+        data.top_k,
+        user_id=data.user_id,
+        file_id=data.file_id      
+        )
 
     return {
         "status": "success",

@@ -71,7 +71,7 @@ import ChunkModel from "../models/chunk.model.js"
 
 const askController = async (req, res) => {
   try {
-    const { question, top_k = 3, user_id } = req.body
+    const { question, top_k = 3, file_id } = req.body
 
     // 1️⃣ Validation
     if (!question || !question.trim()) {
@@ -82,21 +82,22 @@ const askController = async (req, res) => {
     }
 
 
-    if (!user_id || !user_id.trim()) {
+    if (!file_id || !file_id.trim()) {
       return res.status(400).json({
         success: false,
-        message: "User ID is empty"
+        message: "File ID is empty"
       })
     }
 
     // 2️⃣ FAISS search
     const searchResponse = await axios.post(
       `${process.env.AI_SERVICE_BASE_URL}/search`,
-      { query: question, top_k },
+      { query: question, top_k: Math.max(top_k, 5), file_id, user_id: req.user.id },
       { timeout: 30000 }
     )
 
     const matches = searchResponse.data.results || []
+    console.log("MATCHES:", matches)
 
     // 🔥 FIX 1: early return
     if (matches.length === 0) {
@@ -106,8 +107,6 @@ const askController = async (req, res) => {
         sources: []
       })
     }
-
-    console.log("MATCHES:", matches)
 
     // 3️⃣ MongoDB fetch
     const dbChunks = await ChunkModel.find({
@@ -150,9 +149,9 @@ const askController = async (req, res) => {
       {
         question,
         context, 
-        user_id
+        user_id: req.user.id
       },
-      { timeout: 30000 }
+      { timeout: 60000 }
     )
 
     // 6️⃣ Response

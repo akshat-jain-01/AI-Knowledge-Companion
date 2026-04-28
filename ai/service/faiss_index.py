@@ -84,34 +84,32 @@ def add_embedding(embedding: list[float], metadata: dict):
     save_metadata(metadata_store)
 
 
-def search(query_embedding: list[float], k: int = 3):
-    """
-    query_embedding: list[float]
-    return: list of metadata dicts
-    """
+def search(query_embedding: list[float], k: int, user_id: str, file_id: str):
 
     if index.ntotal == 0:
         return []
 
-    if not query_embedding or len(query_embedding) != EMBEDDING_DIM:
-        raise ValueError("Invalid query embedding")
-
     query_vector = np.array([query_embedding], dtype="float32")
     faiss.normalize_L2(query_vector)
 
-    # 🔥 safe k (important)
-    k = min(k, index.ntotal)
+    requested_k = k
+    search_k = min(max(k * 10, 10), index.ntotal)  # 🔥 overfetch farther to find relevant chunks
 
-    distances, indices = index.search(query_vector, k)
+    distances, indices = index.search(query_vector, search_k)
 
     results = []
 
     for idx in indices[0]:
-        if idx == -1:
+        if idx == -1 or idx >= len(metadata_store):
             continue
 
-        # 🔥 safety check (avoid index mismatch crash)
-        if idx < len(metadata_store):
-            results.append(metadata_store[idx])
+        meta = metadata_store[idx]
 
-    return results
+        # 🔥 STRICT FILTER
+        if meta["user_id"] == user_id and meta["file_id"] == file_id:
+            results.append(meta)
+
+        if len(results) >= requested_k:
+            break
+
+    return results[:requested_k]

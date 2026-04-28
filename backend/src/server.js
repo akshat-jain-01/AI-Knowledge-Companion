@@ -8,7 +8,7 @@ dotenv.config()
 connectDB()
 //app.use('/api/test', router)
 
-const port = process.env.PORT || 5003
+const port = process.env.PORT || 5004
 
 app.listen(port, () =>{
     console.log(`App is running on the port ${port}`)

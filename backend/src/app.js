@@ -10,7 +10,9 @@ import 'dotenv/config'
 import router2 from './services/aiServices.js'
 import askRoute from './routes/askRoute.js'
 import router3 from './routes/summaryRoutes.js'
-
+import { authMiddleware } from './middleware/auth.js'
+import routers from './routes/documentRoute.js'
+import ChunkModel from "./models/chunk.model.js";
 const app = express()
 
 app.use(cors())
@@ -22,13 +24,19 @@ app.get('/', (req, res) =>{
     console.log("AI SERVICE URL:", process.env.AI_SERVICE_BASE_URL)
 })
 
-app.post('/uploader', upload.single("file"), uploader)
+app.post('/api/uploader',authMiddleware, upload.single("file"), uploader)
 
 app.use('/api/auth', authRoute)
 app.use('/api/ai', router2)
 app.use("/api", askRoute)
 app.use("/api", router3)
+app.use("/api", routers)
 
+
+// app.delete("/delete-all", async (req, res) => {
+//   await ChunkModel.deleteMany({});
+//   res.send("All chunks deleted");
+// });
 
 app.use((err, req, res, next) =>{
 

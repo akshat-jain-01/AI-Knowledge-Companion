@@ -27,7 +27,8 @@ const uploader = async (req, res) => {
 
     const chunks = chunkText({
       text: text,
-      userId: req.user?.id || "temp_user",
+      fileName: req.file.originalname,
+      userId: req.user.id,
       fileId: req.file.filename
     })
 
@@ -51,6 +52,7 @@ const uploader = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      file_id: req.file.filename,
       message: "File uploaded, chunked, and embedded successfully",
       chunks_embedded: chunks.length,
       file: {

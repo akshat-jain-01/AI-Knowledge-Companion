@@ -1,8 +1,8 @@
 def build_prompt(context_or_chunks, question: str, history) -> str:
     system_instruction = (
         "You are a helpful AI assistant.\n"
-        "Answer the question using the provided context.\n"
-        "Be concise and clear.\n"
+        "Answer the question using the provided resume context.\n"
+        "Do not invent details; only use what is available in the context.\n"
         "Only say 'I don't know' if the answer is completely missing.\n"
     )
 

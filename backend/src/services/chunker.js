@@ -2,6 +2,7 @@ export const chunkText = ({
   text,
   userId,
   fileId,
+  fileName,
   chunksize = 400,
   overlap = 80,
 }) => {
@@ -28,6 +29,7 @@ export const chunkText = ({
       chunks.push({
         user_id: userId,
         file_id: fileId,
+        file_name: fileName,
         chunk_index: chunkIndex,
         text: currentChunk.trim(),
       });
@@ -46,6 +48,7 @@ export const chunkText = ({
     chunks.push({
       user_id: userId,
       file_id: fileId,
+      file_name: fileName,
       chunk_index: chunkIndex,
       text: currentChunk.trim(),
     });
