@@ -128,7 +128,7 @@ const askController = async (req, res) => {
     ).filter(Boolean)
 
     // 4️⃣ Context build
-    //const MAX_CHARS = 2000  // 🔥 limit
+    //const MAX_CHARS = 2000  // limit
 
     let context = ""
 
