@@ -3,54 +3,63 @@ export const chunkText = ({
   userId,
   fileId,
   fileName,
-  chunksize = 400,
-  overlap = 80,
+  chunkSize = 200,
+  overlap = 40,
 }) => {
   if (!text || typeof text !== "string") {
     throw new Error("Invalid text input for chunking");
   }
 
-  if (overlap >= chunksize) {
+  if (overlap >= chunkSize) {
     throw new Error("Overlap must be smaller than chunk size");
   }
 
-  const paragraphs = text.split(/\n+/).filter((p) => p.trim() !== "");
+  // 🔥 STEP 1: clean text
+  const cleanedText = text.replace(/\s+/g, " ").trim();
+
+  // 🔥 STEP 2: sentence split (semantic split)
+  const sentences = cleanedText.split(/(?<=[.!?])\s+/);
 
   const chunks = [];
   let chunkIndex = 0;
 
-  let currentChunk = "";
+  let currentChunk = [];
   let currentLength = 0;
 
-  for (let para of paragraphs) {
-    const wordCount = para.split(/\s+/).length;
+  for (let sentence of sentences) {
+    const words = sentence.split(/\s+/);
+    const wordCount = words.length;
 
-    if (currentLength + wordCount > chunksize) {
+    // 🔥 if adding sentence exceeds limit → finalize chunk
+    if (currentLength + wordCount > chunkSize) {
+      const chunkText = currentChunk.join(" ");
+
       chunks.push({
         user_id: userId,
         file_id: fileId,
         file_name: fileName,
-        chunk_index: chunkIndex,
-        text: currentChunk.trim(),
+        chunk_index: chunkIndex++,
+        text: chunkText,
       });
 
-      chunkIndex++;
-
-      currentChunk = para;
-      currentLength = wordCount;
-    } else {
-      currentChunk += " " + para;
-      currentLength += wordCount;
+      // 🔥 overlap logic
+      const overlapWords = chunkText.split(" ").slice(-overlap);
+      currentChunk = [overlapWords.join(" ")];
+      currentLength = overlapWords.length;
     }
+
+    currentChunk.push(sentence);
+    currentLength += wordCount;
   }
 
-  if (currentChunk) {
+  // 🔥 last chunk
+  if (currentChunk.length > 0) {
     chunks.push({
       user_id: userId,
       file_id: fileId,
       file_name: fileName,
-      chunk_index: chunkIndex,
-      text: currentChunk.trim(),
+      chunk_index: chunkIndex++,
+      text: currentChunk.join(" "),
     });
   }
 

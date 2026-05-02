@@ -6,6 +6,6 @@ def generate_embedding(text : str):
     if not text or not text.strip():
         raise ValueError("Text is empty")
     
-    embedding = model.encode(text)
+    embedding = model.encode(text, normalize_embeddings=True)
 
     return embedding.tolist()

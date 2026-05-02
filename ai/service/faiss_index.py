@@ -93,7 +93,7 @@ def search(query_embedding: list[float], k: int, user_id: str, file_id: str):
     faiss.normalize_L2(query_vector)
 
     requested_k = k
-    search_k = min(max(k * 10, 10), index.ntotal)  # 🔥 overfetch farther to find relevant chunks
+    search_k = min(max(k * 50, 100), index.ntotal)  # 🔥 overfetch farther to find relevant chunks
 
     distances, indices = index.search(query_vector, search_k)
 
