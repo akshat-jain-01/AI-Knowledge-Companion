@@ -87,7 +87,7 @@ An AI-powered document assistant that enables users to upload PDFs/DOCX files an
 ### 1. Clone the repo
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/akshat-jain-01/AI-Knowledge-Companion.git
 cd project-folder
 ```
 
