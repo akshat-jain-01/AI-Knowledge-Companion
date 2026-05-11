@@ -1,6 +1,8 @@
 # 🧠 AI Knowledge Companion (RAG-based System)
 
-An AI-powered document assistant that enables users to upload PDFs/DOCX files and ask questions using natural language. The system uses Retrieval-Augmented Generation (RAG) with semantic search to provide accurate, context-aware answers.
+An AI-powered document assistant that enables users to upload PDF and DOCX files and interact with them using natural language queries.
+
+The system uses Retrieval-Augmented Generation (RAG) with semantic search to retrieve the most relevant document context before generating responses.
 
 ---
 
@@ -8,23 +10,55 @@ An AI-powered document assistant that enables users to upload PDFs/DOCX files an
 
 * 📄 Upload and process PDF/DOCX documents
 * 🔍 Semantic search using FAISS vector database
-* 🤖 Context-aware answers using LLM (FLAN-T5)
-* 💬 ChatGPT-style UI with document-based chat
-* 🔐 User-specific document isolation (JWT auth)
-* ⚡ Optimized retrieval pipeline (low latency + high accuracy)
+* 🤖 Context-aware answers using FLAN-T5
+* 💬 ChatGPT-style conversational interface
+* 🔐 User-specific document isolation with JWT authentication
+* ⚡ Optimized retrieval pipeline for efficient response generation
+* 🛡️ Hallucination-aware response handling
 
 ---
 
-## 🧠 How It Works (Pipeline)
+## 🧠 How It Works (RAG Pipeline)
 
-1. Document upload → text extraction
-2. Text → chunking (semantic + paragraph aware)
-3. Chunk → embedding (SentenceTransformers)
-4. Store embeddings in FAISS
-5. User query → embedding
-6. FAISS retrieves top relevant chunks
-7. Context built from chunks
-8. LLM generates final answer
+1. User uploads a document
+2. Text extraction and preprocessing
+3. Document chunking
+4. Embedding generation using SentenceTransformers
+5. Embeddings stored in FAISS vector index
+6. User query converted into embedding
+7. Top relevant chunks retrieved from FAISS
+8. Retrieved context injected into prompt
+9. FLAN-T5 generates final response
+
+---
+
+## 🛡️ Hallucination Control
+
+The assistant generates responses strictly from retrieved document context.
+
+If relevant information is not found in the uploaded document, the system avoids generating unsupported or hallucinated responses.
+
+This improves reliability and keeps answers grounded in the document content.
+
+---
+
+## 🏗️ Architecture Overview
+
+```text
+User
+  ↓
+React Frontend
+  ↓
+Node.js API Layer
+  ↓
+FastAPI AI Service
+  ↓
+SentenceTransformers → FAISS Retrieval
+  ↓
+Retrieved Context
+  ↓
+FLAN-T5 Response Generation
+```
 
 ---
 
@@ -37,82 +71,133 @@ An AI-powered document assistant that enables users to upload PDFs/DOCX files an
 
 ### Backend
 
-* Node.js + Express.js
-* FastAPI (AI services)
+* Node.js
+* Express.js
+* FastAPI
 
 ### AI / ML
 
-* SentenceTransformers (embeddings)
-* FAISS (vector search)
-* FLAN-T5 (LLM)
+* SentenceTransformers
+* FAISS
+* FLAN-T5
 
 ### Database
 
-* MongoDB (chunk storage + metadata)
+* MongoDB (metadata and document storage)
 
 ---
 
 ## ⚙️ Key Engineering Decisions
 
-* ✅ **Chunking Strategy:** Hybrid (paragraph + sentence) for better semantic retrieval
-* ✅ **File-specific FAISS indexing:** Ensures accurate and isolated retrieval
-* ✅ **Context Limiting:** Improves latency without sacrificing accuracy
-* ❌ Avoided heavy reranking to reduce latency for small datasets
-* ⚖️ Balanced trade-off between accuracy and performance
+* ✅ Paragraph-based chunking for better semantic retrieval
+* ✅ File-specific FAISS indexing for isolated retrieval
+* ✅ Context limiting to reduce unnecessary token usage
+* ✅ Efficient retrieval pipeline focused on response speed and relevance
+* ❌ Avoided heavy reranking models to keep latency low for smaller datasets
+* ⚖️ Balanced trade-off between retrieval quality and performance
 
 ---
 
-## ⚡ Performance
+## ⚡ Performance Optimizations
 
-* Optimized token usage for faster LLM inference
-* Efficient retrieval with FAISS (milliseconds search time)
+* Optimized token usage for faster inference
+* Efficient FAISS retrieval with low-latency vector search
+* Reusable embedding storage to avoid unnecessary recomputation
 
 ---
 
 ## 🧪 Example Queries
 
-* "List technologies mentioned"
-* "Tell me about all the rounds of the given hackathon"
+* "List technologies mentioned in the document"
+* "Summarize the project requirements"
+* "Tell me about all the rounds of the hackathon"
+* "What are the key responsibilities mentioned?"
+
+---
+
+## 📂 Project Structure
+
+```text
+frontend/      → React frontend
+backend/       → Node.js APIs
+ai-service/    → FastAPI + RAG pipeline
+assets/        → Screenshots and demo assets
+```
 
 ---
 
 ## 📸 Screenshots
 
-(Add UI screenshots here)
+### Dashboard UI
+
+![Dashboard](assets/dashboard.png)
+
+### Chat Interface
+
+![Chat UI](assets/chat-ui.png)
+
+### Document Upload
+
+![Upload](assets/upload.png)
+
+---
+
+## 🎥 Demo
+
+Add your LinkedIn demo post or demo video link here.
+
+```md
+[Demo Video](YOUR_LINK_HERE)
+```
 
 ---
 
 ## 🛠️ Setup Instructions
 
-### 1. Clone the repo
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/akshat-jain-01/AI-Knowledge-Companion.git
-cd project-folder
+cd AI-Knowledge-Companion
 ```
 
-### 2. Install dependencies
+### 2. Install Dependencies
+
+#### Backend
 
 ```bash
 npm install
+```
+
+#### AI Service
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 3. Setup environment variables
+---
+
+### 3. Configure Environment Variables
+
+Create a `.env` file in the backend directory:
 
 ```env
 AI_SERVICE_BASE_URL=http://localhost:8000
-MONGO_URI=your_mongo_url
-JWT_SECRET=your_secret
+MONGO_URI=your_mongodb_uri
+JWT_SECRET=your_secret_key
 ```
 
-### 4. Run backend
+---
+
+### 4. Run Backend Server
 
 ```bash
 npm run dev
 ```
 
-### 5. Run AI service
+---
+
+### 5. Run FastAPI AI Service
 
 ```bash
 uvicorn app:app --reload --port 8000
@@ -122,17 +207,20 @@ uvicorn app:app --reload --port 8000
 
 ## 📌 Future Improvements
 
-* Multi-document querying
-* Hybrid search (BM25 + vector)
-* Query rewriting for better retrieval
-* Streaming responses
+* Better retrieval ranking and context filtering
+* Query rewriting for improved retrieval quality
+* Multi-document conversational memory
+* Streaming responses for improved UX
+* Hybrid search (BM25 + vector search)
 * Advanced reranking models
+* Improved response grounding and hallucination detection
 
 ---
 
 ## 🙌 Author
 
-Akshat Jain
-📧 akshatjainkht01@gmail.com
+**Akshat Jain**
+
+📧 [akshatjainkht01@gmail.com](mailto:akshatjainkht01@gmail.com)
 🔗 GitHub: https://github.com/akshat-jain-01
 🔗 LinkedIn: https://linkedin.com/in/akshat-jain-1a71b4376
