@@ -132,14 +132,6 @@ assets/        → Screenshots and demo assets
 
 ![Dashboard](assets/dashboard.png)
 
-### Chat Interface
-
-![Chat UI](assets/chat-ui.png)
-
-### Document Upload
-
-![Upload](assets/upload.png)
-
 ---
 
 ## 🎥 Demo
@@ -147,7 +139,7 @@ assets/        → Screenshots and demo assets
 Add your LinkedIn demo post or demo video link here.
 
 ```md
-[Demo Video](YOUR_LINK_HERE)
+[Demo Video](https://www.linkedin.com/posts/akshat-jain-1a71b4376_ai-rag-llm-ugcPost-7459668572227788800-3Z9d?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFzvAw8BjNgvlF2ili6R4KPZIcaG7D1HUNA)
 ```
 
 ---

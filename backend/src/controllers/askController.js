@@ -73,7 +73,7 @@ const askController = async (req, res) => {
   try {
     const { question, top_k = 3, file_id } = req.body
 
-    // 1️⃣ Validation
+    // Validation
     if (!question || !question.trim()) {
       return res.status(400).json({
         success: false,
@@ -89,7 +89,7 @@ const askController = async (req, res) => {
       })
     }
 
-    // 2️⃣ FAISS search
+    //  FAISS search
     const searchResponse = await axios.post(
       `${process.env.AI_SERVICE_BASE_URL}/search`,
       { query: question, top_k: Math.max(top_k, 5), file_id, user_id: req.user.id },
@@ -99,7 +99,7 @@ const askController = async (req, res) => {
     const matches = searchResponse.data.results || []
     console.log("MATCHES:", matches)
 
-    // 🔥 FIX 1: early return
+    //  FIX 1: early return
     if (matches.length === 0) {
       return res.status(200).json({
         success: true,
@@ -108,7 +108,7 @@ const askController = async (req, res) => {
       })
     }
 
-    // 3️⃣ MongoDB fetch
+    //  MongoDB fetch
     const dbChunks = await ChunkModel.find({
       $or: matches.map(m => ({
         file_id: m.file_id,
@@ -118,7 +118,7 @@ const askController = async (req, res) => {
 
     console.log("DB CHUNKS:", dbChunks.map(c => c.text))
 
-    // 🔥 FIX 2: order maintain kar
+    //  FIX 2: order maintain kar
     const orderedChunks = matches.map(m =>
       dbChunks.find(
         d =>
@@ -127,7 +127,7 @@ const askController = async (req, res) => {
       )
     ).filter(Boolean)
 
-    // 4️⃣ Context build
+    // Context build
     //const MAX_CHARS = 2000  // limit
 
     let context = ""
@@ -143,7 +143,7 @@ const askController = async (req, res) => {
     console.log("CONTEXT:", context)
     
 
-    // 5️⃣ LLM call
+    // LLM call
     const answerResponse = await axios.post(
       `${process.env.AI_SERVICE_BASE_URL}/ask`,
       {
@@ -154,7 +154,7 @@ const askController = async (req, res) => {
       { timeout: 60000 }
     )
 
-    // 6️⃣ Response
+    // Response
     return res.status(200).json({
       success: true,
       answer: answerResponse.data.answer,
